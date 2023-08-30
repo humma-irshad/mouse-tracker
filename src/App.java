@@ -21,54 +21,54 @@ class App extends JComponent implements NativeMouseInputListener {
   // static CustomPaintPanel panel1 = new CustomPaintPanel();
 
   // static class CustomPaintPanel extends JPanel {
-  //   @Override
-  //   public void paint(Graphics g) {
-  //     super.paint(g);
+  // @Override
+  // public void paint(Graphics g) {
+  // super.paint(g);
 
-  //     for (int i = 0; i < xCord.size(); i++) {
-  //       int x = xCord.get(i);
-  //       int y = yCord.get(i);
+  // for (int i = 0; i < xCord.size(); i++) {
+  // int x = xCord.get(i);
+  // int y = yCord.get(i);
 
-  //       g.setColor(Color.BLUE);
-  //       g.drawLine(x, y, x, y);
-  //     }
-  //   }
+  // g.setColor(Color.BLUE);
+  // g.drawLine(x, y, x, y);
+  // }
+  // }
   // }
 
   public void nativeMouseClicked(NativeMouseEvent e) {
     try {
-    FileWriter clickFile = new FileWriter("./data/click_tracks.txt", true);
+      FileWriter clickFile = new FileWriter("./data/click_tracks.txt", true);
 
-    clickFile.write("Mouse clicked " + e.getClickCount() + " times\n");
-    clickFile.close();
+      clickFile.write("Mouse clicked " + e.getClickCount() + " times\n");
+      clickFile.close();
 
     } catch (IOException ex) {
-    System.out.println(ex);
-    System.out.println(ex.getMessage());
+      System.out.println(ex);
+      System.out.println(ex.getMessage());
     }
   }
 
   public void nativeMousePressed(NativeMouseEvent e) {
     try {
-    FileWriter pressedFile = new FileWriter("./data/pressed_tracks.txt", true);
+      FileWriter pressedFile = new FileWriter("./data/pressed_tracks.txt", true);
 
-    pressedFile.write("Mouse pressed " + e.getButton() + " times\n");
-    pressedFile.close();
+      pressedFile.write("Mouse pressed " + e.getButton() + " times\n");
+      pressedFile.close();
     } catch (IOException ex) {
-    System.out.println(ex);
-    System.out.println(ex.getMessage());
+      System.out.println(ex);
+      System.out.println(ex.getMessage());
     }
   }
 
   public void nativeMouseReleased(NativeMouseEvent e) {
     try {
-    FileWriter releaseFile = new FileWriter("./data/release_tracks.txt", true);
+      FileWriter releaseFile = new FileWriter("./data/release_tracks.txt", true);
 
-    releaseFile.write("Mouse released " + e.getButton() + " times\n");
-    releaseFile.close();
+      releaseFile.write("Mouse released " + e.getButton() + " times\n");
+      releaseFile.close();
     } catch (IOException ex) {
-    System.out.println(ex);
-    System.out.println(ex.getMessage());
+      System.out.println(ex);
+      System.out.println(ex.getMessage());
     }
   }
 
@@ -98,7 +98,20 @@ class App extends JComponent implements NativeMouseInputListener {
   }
 
   public static void main(String[] args) {
-    new App();
+    try {
+      GlobalScreen.registerNativeHook();
+    } catch (NativeHookException ex) {
+      System.err.println("There was a problem registering the native hook.");
+      System.err.println(ex.getMessage());
+
+      System.exit(1);
+    }
+
+    App app = new App();
+
+    // Add the appropriate listeners.
+    GlobalScreen.addNativeMouseListener(app);
+    GlobalScreen.addNativeMouseMotionListener(app);
   }
 }
 

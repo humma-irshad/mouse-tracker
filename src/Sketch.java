@@ -1,67 +1,72 @@
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Toolkit;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.*;
+import javax.swing.*;
+import java.awt.geom.Line2D;
 import java.io.File;
+import java.util.Scanner;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
-public class Sketch extends Frame {
-  public Sketch() {
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
-    int width = (int) screenSize.getWidth();
-    int height = (int) screenSize.getHeight();
-
-    setVisible(true);
-    setSize(width, height);
-    addWindowListener(new WindowAdapter() {
-      @Override
-      public void windowClosing(WindowEvent e) {
-        System.exit(0);
-      }
-    });
+class Sketch extends JPanel {
+  Sketch() {
+    readCoordinatesFromFile();
   }
 
+  static List<Integer> xCord = new ArrayList<>();
+  static List<Integer> yCord = new ArrayList<>();
+
+  @Override
   public void paint(Graphics g) {
-    try {
-      File myObj = new File("./data/drag_tracks");
-      Scanner myReader = new Scanner(myObj);
-      List<Integer> stringFile = new ArrayList<Integer>();
-      List<Integer> xCord = new ArrayList<Integer>();
-      List<Integer> yCord = new ArrayList<Integer>();
+    super.paint(g);
 
-      String str;
-      while (myReader.hasNextLine()) {
-        str = myReader.next();
-        Integer strInt = Integer.parseInt(str);
-        stringFile.add(strInt);
+    for (int i = 0; i < xCord.size(); i++) {
+      int x = xCord.get(i);
+      int y = yCord.get(i);
 
-        Integer[] array = stringFile.toArray(new Integer[0]);
-        for (Integer j = 0; j < array.length; j++) {
-          if ((float) j % 2 != 0) {
-            yCord.add(array[j]);
-          } else {
-            xCord.add(array[j]);
-          }
-        }
-      }
-
-      Integer[] xCordArray = xCord.toArray(new Integer[0]);
-      for (int i = 0; i < xCordArray.length; i++) {
-        System.out.print(xCordArray[i]);
-      }
-
-      myReader.close();
-    } catch (Exception e) {
-      e.getMessage();
+      Graphics2D g2 = (Graphics2D) g;
+      g2.setStroke(new BasicStroke(5));
+      g2.draw(new Line2D.Float(x - 300, y - 300, x - 300, y - 300));
     }
   }
 
   public static void main(String[] args) {
-    new Sketch();
+    try {
+      Sketch sketch = new Sketch();
+
+      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+      int width = (int) screenSize.getWidth();
+      int height = (int) screenSize.getHeight();
+
+      JFrame frame = new JFrame("Mouse Tracker");
+      frame.setSize(width, height);
+      frame.setVisible(true);
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+      frame.add(sketch);
+    } catch (Exception e) {
+      System.out.print(e.getMessage());
+    }
+  }
+
+  private void readCoordinatesFromFile() {
+    try {
+      File myObj = new File("./data/drag_tracks.txt");
+      Scanner myReader = new Scanner(myObj);
+
+      while (myReader.hasNextLine()) {
+        int x = Integer.parseInt(myReader.next());
+        int y = Integer.parseInt(myReader.next());
+        xCord.add(x);
+        yCord.add(y);
+
+        if (!myReader.nextLine().isEmpty())
+          break;
+      }
+
+      myReader.close();
+    } catch (IOException e) {
+      System.out.print(e);
+      e.printStackTrace();
+    }
   }
 }
